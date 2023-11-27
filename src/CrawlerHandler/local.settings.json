@@ -1,0 +1,14 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "Crawler:AllowedOrigin": "http://localhost:5173",
+    "Crawler:CacheItemsTimeSpanInDays": 1,
+    "Crawler:CountOfTopWordsThatWillBeReturned": 15
+  },
+  "Host": {
+    "LocalHttpPort": 7180,
+    "CORS": "*"
+  }
+}
