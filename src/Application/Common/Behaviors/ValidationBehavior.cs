@@ -3,7 +3,7 @@ using ErrorOr;
 using FluentValidation;
 using MediatR;
 
-namespace Application.Common.Behaviors;
+namespace Crawler.Application.Common.Behaviors;
 
 [ExcludeFromCodeCoverage]
 public class ValidationBehavior<TRequest, TResponse> :

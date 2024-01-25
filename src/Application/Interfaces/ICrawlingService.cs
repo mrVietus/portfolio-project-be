@@ -1,6 +1,6 @@
-﻿using Domain.Models;
+﻿using Crawler.Domain.Models;
 
-namespace Application.Interfaces;
+namespace Crawler.Application.Interfaces;
 
 public interface ICrawlingService
 {

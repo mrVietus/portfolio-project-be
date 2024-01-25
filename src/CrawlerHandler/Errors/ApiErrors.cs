@@ -1,6 +1,6 @@
 ﻿using ErrorOr;
 
-namespace FunctionHandler.Errors;
+namespace Crawler.FunctionHandler.Errors;
 
 public static class ApiErrors
 {

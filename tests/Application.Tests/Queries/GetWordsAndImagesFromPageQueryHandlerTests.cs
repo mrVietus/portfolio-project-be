@@ -1,22 +1,21 @@
-﻿using Application.Crawler.Queries;
-using Application.Interfaces;
-using AutoFixture;
-using Domain.Models;
+﻿using AutoFixture;
+using Crawler.Application.Crawler.Queries;
+using Crawler.Application.Interfaces;
+using Crawler.Domain.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-
 using NSubstitute.ExceptionExtensions;
 
-namespace Application.Tests.Queries;
+namespace Crawler.Application.Tests.Queries;
 
 [TestFixture]
 public class GetWordsAndImagesFromPageQueryHandlerTests
 {
-    private GetWordsAndImagesFromPageQueryHandler _sut;
+    private GetWordsAndImagesFromPageQueryHandler? _sut;
 
-    private ILogger<GetWordsAndImagesFromPageQueryHandler> _logger;
-    private ICrawlingService _crawlingService;
-    private IOptions<CrawlerSettings> _options;
+    private ILogger<GetWordsAndImagesFromPageQueryHandler>? _logger;
+    private ICrawlingService? _crawlingService;
+    private IOptions<CrawlerSettings>? _options;
 
     private readonly int _countOfTopWords = 10;
 
@@ -47,11 +46,11 @@ public class GetWordsAndImagesFromPageQueryHandlerTests
         var query = new GetWordsAndImagesFromPageQuery(url);
         var cancellationToken = new CancellationToken();
 
-        _crawlingService.CrawlAsync(url, cancellationToken)
+        _crawlingService?.CrawlAsync(url, cancellationToken)
             .Returns(crawlingResult);
 
         // Act
-        var result = await _sut.Handle(query, cancellationToken);
+        var result = await _sut!.Handle(query, cancellationToken);
 
         // Assert
         result.Should().NotBeNull();
@@ -60,7 +59,7 @@ public class GetWordsAndImagesFromPageQueryHandlerTests
         result.Value.TopWords.Should().HaveCount(_countOfTopWords);
         result.Value.PageWordsCount.Should().Be(crawlingResult.WordsCount);
 
-        await _crawlingService.Received(1).CrawlAsync(url, cancellationToken);
+        await _crawlingService.Received(1)!.CrawlAsync(url, cancellationToken);
     }
 
     [Test, AutoData]
@@ -70,12 +69,12 @@ public class GetWordsAndImagesFromPageQueryHandlerTests
         var query = new GetWordsAndImagesFromPageQuery(url);
         var cancellationToken = new CancellationToken();
 
-        _crawlingService.CrawlAsync(url, cancellationToken)
+        _crawlingService!.CrawlAsync(url, cancellationToken)
             .Throws(new Exception("Crawling error"));
 
 
         // Assert
-        Assert.ThrowsAsync<Exception>(() => _sut.Handle(query, cancellationToken));
+        Assert.ThrowsAsync<Exception>(() => _sut!.Handle(query, cancellationToken));
         await _crawlingService.Received(1).CrawlAsync(url, cancellationToken);
     }
 }

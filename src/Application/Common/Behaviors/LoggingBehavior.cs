@@ -3,7 +3,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace Application.Common.Behaviors;
+namespace Crawler.Application.Common.Behaviors;
 
 [ExcludeFromCodeCoverage]
 public class LoggingBehavior<TRequest, TResponse> :

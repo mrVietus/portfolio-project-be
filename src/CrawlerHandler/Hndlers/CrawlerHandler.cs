@@ -1,25 +1,20 @@
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Crawler.Queries;
-using Application.Interfaces;
-using FunctionHandler.Errors;
+using Crawler.Application.Crawler.Queries;
+using Crawler.Application.Interfaces;
+using Crawler.FunctionHandler.Errors;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 
-namespace FunctionHandler.Hndlers;
+namespace Crawler.FunctionHandler.Hndlers;
 
 internal class CrawlerHandler : BaseHandler
 {
     private readonly ICacheService _cacheService;
     private readonly ISender _sender;
     private readonly ILogger<CrawlerHandler> _logger;
-
-    private const string UrlQueryParam = "url";
 
     public CrawlerHandler(ICacheService cacheService, ISender sender, ILogger<CrawlerHandler> logger)
     {
@@ -28,39 +23,36 @@ internal class CrawlerHandler : BaseHandler
         _logger = logger;
     }
 
-    [FunctionName("GetImagesWithTopWords")]
-    public async Task<IActionResult> GetImagesWithTopWordsAsync(
+    [Function("GetImagesWithTopWords")]
+    public async Task<HttpResponseData> GetImagesWithTopWordsAsync(
         [HttpTrigger(AuthorizationLevel.Function, "get", Route = "pagedata")]
-        HttpRequestMessage request, CancellationToken cancellationToken)
+        HttpRequestData request, string url, CancellationToken cancellationToken)
     {
-        var queryParams = QueryHelpers.ParseNullableQuery(request.RequestUri.Query);
-        if (queryParams == null || !queryParams.ContainsKey(UrlQueryParam))
+        if (string.IsNullOrWhiteSpace(url))
         {
             _logger.LogWarning("No URL provided in query parameters.");
-            return Problem(ApiErrors.MissingUrlQueryParameter);
+            return await ProblemAsync(request, ApiErrors.MissingUrlQueryParameter, cancellationToken);
         }
-
-        var url = queryParams[UrlQueryParam];
 
         var cachedValue = _cacheService.GetFromCache<GetWordsAndImagesFromPageQueryResponse>(url);
         if (cachedValue != null)
         {
             _logger.LogInformation("Got response from CACHE for url: {url}.", url);
-            return Ok(cachedValue);
+            return await OkAsync(request, cachedValue, cancellationToken);
         }
 
         var query = new GetWordsAndImagesFromPageQuery(url);
         var queryResult = await _sender.Send(query, cancellationToken);
 
-        return queryResult.Match(
-            result => CacheResponseAndRespondOk(url, result),
-            errors => Problem(errors)
+        return await queryResult.MatchAsync(
+            async result => await CacheResponseAndRespondOkAsync(url, result, request, cancellationToken),
+            async errors => await ProblemAsync(request, errors, cancellationToken)
         );
     }
 
-    public OkObjectResult CacheResponseAndRespondOk<T>(string key, T value)
+    public async Task<HttpResponseData> CacheResponseAndRespondOkAsync<T>(string key, T value, HttpRequestData request, CancellationToken cancellationToken)
     {
-        _cacheService.SetCache<T>(key, value);
-        return Ok(value);
+        _cacheService.SetCache(key, value);
+        return await OkAsync(request, value, cancellationToken);
     }
 }

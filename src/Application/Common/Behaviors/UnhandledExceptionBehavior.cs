@@ -2,7 +2,7 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Common.Behaviors;
+namespace Crawler.Application.Common.Behaviors;
 
 [ExcludeFromCodeCoverage]
 public class UnhandledExceptionBehavior<TRequest, TResponse> :

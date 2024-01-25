@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Domain.Messages;
+using Crawler.Domain.Messages;
 using FluentValidation;
 
-namespace Application.Crawler.Queries;
+namespace Crawler.Application.Crawler.Queries;
 
 [ExcludeFromCodeCoverage]
 public class GetWordsAndImagesFromPageQueryValidator : AbstractValidator<GetWordsAndImagesFromPageQuery>

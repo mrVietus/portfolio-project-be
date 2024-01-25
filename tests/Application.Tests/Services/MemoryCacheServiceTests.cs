@@ -1,20 +1,19 @@
-﻿using Application.Services;
+﻿using Crawler.Application.Services;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
-namespace Application.Tests.Services;
+namespace Crawler.Application.Tests.Services;
 
 [TestFixture]
 public class MemoryCacheServiceTests
 {
-    private MemoryCacheService _sut;
-    private IMemoryCache _memoryCache;
-    private IOptions<CrawlerSettings> _options;
+    private MemoryCacheService? _sut;
+    private IMemoryCache _memoryCache = Substitute.For<IMemoryCache>();
+    private IOptions<CrawlerSettings>? _options;
 
     [SetUp]
     public void SetUp()
     {
-        _memoryCache = Substitute.For<IMemoryCache>();
         _options = Options.Create(new CrawlerSettings()
         {
             CacheItemsTimeSpanInDays = 1
@@ -29,14 +28,14 @@ public class MemoryCacheServiceTests
         // Arrange
         var key = "some-key";
         var value = "some-value";
-        _memoryCache.TryGetValue(key, out Arg.Any<object>()).Returns(x =>
+        _memoryCache.TryGetValue(key, out Arg.Any<object?>()).Returns(x =>
         {
             x[1] = value;
             return true;
         });
 
         // Act
-        var result = _sut.GetFromCache<string>(key);
+        var result = _sut!.GetFromCache<string>(key);
 
         // Assert
         result.Should().Be(value);
@@ -47,11 +46,11 @@ public class MemoryCacheServiceTests
     {
         // Arrange
         var key = "some-key";
-        _memoryCache.TryGetValue(key, out Arg.Any<object>())
+        _memoryCache.TryGetValue(key, out Arg.Any<object?>())
             .Returns(false);
 
         // Act
-        var result = _sut.GetFromCache<string>(key);
+        var result = _sut!.GetFromCache<string>(key);
 
         // Assert
         result.Should().BeNull();
@@ -72,9 +71,15 @@ public class MemoryCacheServiceTests
         });
 
         // Act
-        _sut.SetCache<string>(key, value);
+        _sut!.SetCache(key, value);
 
         // Assert
         _memoryCache.Received(1).Set(key, value, options);
+    }
+
+    [OneTimeTearDown]
+    public void CleanupAfterAllTests()
+    {
+        _memoryCache.Dispose();
     }
 }

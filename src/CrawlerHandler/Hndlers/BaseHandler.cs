@@ -1,45 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using ErrorOr;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Azure.Functions.Worker.Http;
 
-namespace FunctionHandler.Hndlers;
+namespace Crawler.FunctionHandler.Hndlers;
 
 internal class BaseHandler
 {
-    protected IActionResult Problem(List<Error> errors)
+    protected async Task<HttpResponseData> ProblemAsync(HttpRequestData request, List<Error> errors, CancellationToken cancellationToken = default)
     {
         if (errors.Count is 0)
         {
-            return Problem();
+            return await ProblemAsync(request, cancellationToken: cancellationToken);
         }
 
         if (errors.All(error => error.Type == ErrorType.Validation))
         {
-            return ValidationProblem(errors);
+            return await ValidationProblemAsync(request, errors, cancellationToken);
         }
 
-        return Problem(errors.FirstOrDefault());
+        return await ProblemAsync(request, errors.FirstOrDefault(), cancellationToken);
     }
 
-    protected IActionResult Problem(Error error)
+    protected async Task<HttpResponseData> ProblemAsync(HttpRequestData request, Error error, CancellationToken cancellationToken = default)
     {
         var statusCode = error.Type switch
         {
-            ErrorType.Conflict => StatusCodes.Status409Conflict,
-            ErrorType.Validation => StatusCodes.Status400BadRequest,
-            ErrorType.NotFound => StatusCodes.Status404NotFound,
-            _ => StatusCodes.Status500InternalServerError
+            ErrorType.Conflict => HttpStatusCode.Conflict,
+            ErrorType.Validation => HttpStatusCode.BadRequest,
+            ErrorType.NotFound => HttpStatusCode.NotFound,
+            _ => HttpStatusCode.InternalServerError
         };
 
-        return Problem(statusCode: statusCode, title: error.Description);
+        return await ProblemAsync(
+            request,
+            statusCode: statusCode,
+            title: error.Description,
+            cancellationToken: cancellationToken
+        );
     }
 
-    private IActionResult ValidationProblem(List<Error> errors)
+    private async Task<HttpResponseData> ValidationProblemAsync(HttpRequestData request, List<Error> errors, CancellationToken cancellationToken = default)
     {
         var modelStateDictionary = new ModelStateDictionary();
 
@@ -50,61 +58,75 @@ internal class BaseHandler
                 error.Description);
         }
 
-        return ValidationProblem(modelStateDictionary: modelStateDictionary);
+        return await ValidationProblemAsync(
+            request, 
+            modelStateDictionary:modelStateDictionary, 
+            cancellationToken: cancellationToken
+        );
     }
 
-    public virtual OkObjectResult Ok([ActionResultObjectValue] object value)
-        => new(value);
+    public virtual async Task<HttpResponseData> OkAsync(HttpRequestData request, object value, CancellationToken cancellationToken = default)
+    {
+        var response = request.CreateResponse(HttpStatusCode.OK);
+        await response.WriteAsJsonAsync(value, cancellationToken);
 
-    public virtual ObjectResult Problem(
+        return response;
+    }
+
+    public virtual async Task<HttpResponseData> ProblemAsync(
+        HttpRequestData request,
         string detail = null,
         string instance = null,
-        int? statusCode = null,
+        HttpStatusCode? statusCode = null,
         string title = null,
-        string type = null)
+        string type = null,
+        CancellationToken cancellationToken = default)
     {
         var host = Environment.GetEnvironmentVariable("WEBSITE_HOSTNAME");
         var problemDetails = new ProblemDetails
         {
-            Status = statusCode ?? 500,
+            Status = ((int?)statusCode) ?? 500,
             Title = title,
             Detail = detail,
             Type = type ?? $"{host}/errors"
         };
 
-        return new ObjectResult(problemDetails)
-        {
-            StatusCode = statusCode,
-            ContentTypes = { "application/problem+json" }
-        };
+        var response = request.CreateResponse(statusCode ?? HttpStatusCode.InternalServerError);
+        await response.WriteAsJsonAsync(problemDetails, cancellationToken);
+
+        return response;
     }
 
-    public virtual ActionResult ValidationProblem(
+    public virtual async Task<HttpResponseData> ValidationProblemAsync(
+        HttpRequestData request,
+        ModelStateDictionary modelStateDictionary,
         string detail = null,
         string instance = null,
-        int? statusCode = null,
+        HttpStatusCode? statusCode = null,
         string title = null,
         string type = null,
-        [ActionResultObjectValue] ModelStateDictionary modelStateDictionary = null)
+        CancellationToken cancellationToken = default)
     {
         var validationProblem = new ValidationProblemDetails(modelStateDictionary)
         {
             Detail = detail,
             Instance = instance,
-            Status = statusCode,
+            Status = (int?)statusCode,
             Title = title,
             Type = type,
         };
 
         if (validationProblem is { Status: 400 })
         {
-            return new BadRequestObjectResult(validationProblem);
+            var badRequestResponse = request.CreateResponse(HttpStatusCode.BadRequest);
+            await badRequestResponse.WriteAsJsonAsync(validationProblem, cancellationToken);
+
+            return badRequestResponse;
         }
 
-        return new ObjectResult(validationProblem)
-        {
-            StatusCode = validationProblem?.Status,
-            ContentTypes = { "application/problem+json" }
-        };
+        var response = request.CreateResponse(statusCode ?? HttpStatusCode.InternalServerError);
+        await response.WriteAsJsonAsync(validationProblem, cancellationToken);
+
+        return response;
     }
 }
