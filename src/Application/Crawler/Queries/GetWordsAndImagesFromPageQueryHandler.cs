@@ -1,11 +1,11 @@
-﻿using Application.Common.Settings;
-using Application.Interfaces;
+﻿using Crawler.Application.Common.Settings;
+using Crawler.Application.Interfaces;
 using ErrorOr;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Application.Crawler.Queries;
+namespace Crawler.Application.Crawler.Queries;
 
 public class GetWordsAndImagesFromPageQueryHandler : IRequestHandler<GetWordsAndImagesFromPageQuery, ErrorOr<GetWordsAndImagesFromPageQueryResponse>>
 {

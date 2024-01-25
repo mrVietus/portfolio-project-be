@@ -1,16 +1,16 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using Application.Common.Behaviors;
-using Application.Common.Settings;
-using Application.Interfaces;
-using Application.Services;
+using Crawler.Application.Common.Behaviors;
+using Crawler.Application.Common.Settings;
+using Crawler.Application.Interfaces;
+using Crawler.Application.Services;
 using FluentValidation;
 using HtmlAgilityPack;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Application;
+namespace Crawler.Application;
 
 [ExcludeFromCodeCoverage]
 public static class DependencyInjection

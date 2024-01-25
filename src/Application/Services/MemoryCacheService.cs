@@ -1,9 +1,9 @@
-﻿using Application.Common.Settings;
-using Application.Interfaces;
+﻿using Crawler.Application.Common.Settings;
+using Crawler.Application.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
-namespace Application.Services;
+namespace Crawler.Application.Services;
 
 public class MemoryCacheService : ICacheService
 {
@@ -18,12 +18,12 @@ public class MemoryCacheService : ICacheService
 
     public T? GetFromCache<T>(string key)
     {
-        if (_memoryCache.TryGetValue(key, out T value))
+        if (_memoryCache.TryGetValue(key, out T? value))
         {
             return value;
         }
 
-        return default(T);
+        return default;
     }
 
     public void SetCache<T>(string key, T value)

@@ -1,7 +1,7 @@
 ﻿using ErrorOr;
 using MediatR;
 
-namespace Application.Crawler.Queries;
+namespace Crawler.Application.Crawler.Queries;
 
 public record GetWordsAndImagesFromPageQuery(
     string Url

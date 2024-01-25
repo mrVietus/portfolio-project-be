@@ -1,4 +1,4 @@
-﻿namespace Domain.Messages;
+﻿namespace Crawler.Domain.Messages;
 
 public static class Messages
 {

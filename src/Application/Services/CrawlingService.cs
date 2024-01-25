@@ -1,11 +1,11 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
-using Application.Interfaces;
-using Domain.Models;
+using Crawler.Application.Interfaces;
+using Crawler.Domain.Models;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Services;
+namespace Crawler.Application.Services;
 
 public class CrawlingService : ICrawlingService
 {
