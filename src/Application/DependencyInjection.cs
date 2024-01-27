@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Crawler.Application.Common.Behaviors;
+using Crawler.Application.Common.Interfaces;
 using Crawler.Application.Common.Settings;
-using Crawler.Application.Interfaces;
 using Crawler.Application.Services;
 using FluentValidation;
 using HtmlAgilityPack;

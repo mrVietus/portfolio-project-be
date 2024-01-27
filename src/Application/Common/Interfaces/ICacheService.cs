@@ -1,4 +1,4 @@
-﻿namespace Crawler.Application.Interfaces;
+﻿namespace Crawler.Application.Common.Interfaces;
 
 public interface ICacheService
 {

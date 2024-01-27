@@ -1,6 +1,6 @@
 ﻿using AutoFixture;
+using Crawler.Application.Common.Interfaces;
 using Crawler.Application.Crawler.Queries;
-using Crawler.Application.Interfaces;
 using Crawler.Domain.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

@@ -7,6 +7,9 @@
     "Crawler:CacheItemsTimeSpanInDays": 1,
     "Crawler:CountOfTopWordsThatWillBeReturned": 15
   },
+  "ConnectionStrings": {
+    "CrawlerDatabase": "Server=localhost,1433; Database=Crawler; User Id=sa; Password=SqlP@ssw0rd; TrustServerCertificate=True;"
+  },
   "Host": {
     "LocalHttpPort": 7180,
     "CORS": "*"

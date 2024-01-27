@@ -1,5 +1,5 @@
-﻿using Crawler.Application.Common.Settings;
-using Crawler.Application.Interfaces;
+﻿using Crawler.Application.Common.Interfaces;
+using Crawler.Application.Common.Settings;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
