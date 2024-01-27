@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using Crawler.Application;
 using Crawler.FunctionHandler.Middleware;
+using Crawler.Infrastructure;
+using Crawler.Infrastructure.Persistance.Database.Migrations.HostExtensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,6 +17,7 @@ var host = new HostBuilder()
         (context, services) =>
         {
             services.AddApplication(context.Configuration);
+            services.AddInfrastructure(context.Configuration);
             services.AddMemoryCache();
             services.AddLogging(loggingBuilder =>
             {
@@ -31,4 +34,5 @@ var host = new HostBuilder()
     })
     .Build();
 
+host.MigrateDatabase();
 host.Run();

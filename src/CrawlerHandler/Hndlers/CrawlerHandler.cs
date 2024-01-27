@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
+using Crawler.Application.Common.Interfaces;
 using Crawler.Application.Crawler.Queries;
-using Crawler.Application.Interfaces;
 using Crawler.FunctionHandler.Errors;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;

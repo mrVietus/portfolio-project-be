@@ -1,5 +1,5 @@
-﻿using Crawler.Application.Common.Settings;
-using Crawler.Application.Interfaces;
+﻿using Crawler.Application.Common.Interfaces;
+using Crawler.Application.Common.Settings;
 using ErrorOr;
 using MediatR;
 using Microsoft.Extensions.Logging;
