@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using Crawler.Application;
+using Crawler.FunctionHandler.Mappings;
 using Crawler.FunctionHandler.Middleware;
 using Crawler.Infrastructure;
 using Crawler.Infrastructure.Persistance.Database.Migrations.HostExtensions;
@@ -18,7 +19,8 @@ var host = new HostBuilder()
         {
             services.AddApplication(context.Configuration);
             services.AddInfrastructure(context.Configuration);
-            services.AddMemoryCache();
+            services.AddMemoryCache(); // Added only for demo purposes - normally we should add distributed cache for AzureFunction
+            services.AddMappings();
             services.AddLogging(loggingBuilder =>
             {
                 loggingBuilder.AddFilter(level => true);

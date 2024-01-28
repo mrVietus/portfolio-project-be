@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Crawler.Infrastructure.Persistance.Database.Configurations;
 
-public class CrawlResultEntityTypeConfiguration : IEntityTypeConfiguration<CrawlResult>
+public class CrawlResultEntityTypeConfiguration : IEntityTypeConfiguration<CrawlResultEntity>
 {
-    public void Configure(EntityTypeBuilder<CrawlResult> builder)
+    public void Configure(EntityTypeBuilder<CrawlResultEntity> builder)
     {
         builder
             .HasKey(e => e.Id);
@@ -46,6 +46,6 @@ public class CrawlResultEntityTypeConfiguration : IEntityTypeConfiguration<Crawl
         builder
             .HasOne(e => e.Crawl)
             .WithOne(e => e.CrawlResult)
-            .HasForeignKey<CrawlResult>(e => e.CrawlId);
+            .HasForeignKey<CrawlResultEntity>(e => e.CrawlId);
     }
 }

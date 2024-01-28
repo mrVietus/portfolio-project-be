@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using ErrorOr;
@@ -59,8 +61,8 @@ internal class BaseHandler
         }
 
         return await ValidationProblemAsync(
-            request, 
-            modelStateDictionary:modelStateDictionary, 
+            request,
+            modelStateDictionary: modelStateDictionary,
             cancellationToken: cancellationToken
         );
     }
@@ -91,8 +93,9 @@ internal class BaseHandler
             Type = type ?? $"{host}/errors"
         };
 
-        var response = request.CreateResponse(statusCode ?? HttpStatusCode.InternalServerError);
+        var response = request.CreateResponse();
         await response.WriteAsJsonAsync(problemDetails, cancellationToken);
+        response.StatusCode = statusCode ?? HttpStatusCode.InternalServerError;
 
         return response;
     }
@@ -118,15 +121,32 @@ internal class BaseHandler
 
         if (validationProblem is { Status: 400 })
         {
-            var badRequestResponse = request.CreateResponse(HttpStatusCode.BadRequest);
+            var badRequestResponse = request.CreateResponse();
             await badRequestResponse.WriteAsJsonAsync(validationProblem, cancellationToken);
+            badRequestResponse.StatusCode = HttpStatusCode.BadRequest;
 
             return badRequestResponse;
         }
 
-        var response = request.CreateResponse(statusCode ?? HttpStatusCode.InternalServerError);
+        var response = request.CreateResponse();
         await response.WriteAsJsonAsync(validationProblem, cancellationToken);
+        response.StatusCode = statusCode ?? HttpStatusCode.InternalServerError;
 
         return response;
+    }
+
+    internal static T TryDeserializeRequestBody<T>(Stream requestBody)
+    {
+        try
+        {
+            using StreamReader reader = new(requestBody);
+            string requestBodyText = reader.ReadToEnd();
+
+            return JsonSerializer.Deserialize<T>(requestBodyText);
+        }
+        catch (Exception)
+        {
+            return default;
+        }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Crawler.Application.Common.Interfaces.Repositories;
 
-public interface ICrawlEfRepository : IRepository<Crawl>
+public interface ICrawlEfRepository : IRepository<CrawlEntity>
 {
-    Task<IEnumerable<Crawl>> GetCrawlsForPageAsync(int page);
+    Task<IEnumerable<CrawlEntity>> GetCrawlsForPageAsync(int page, int itemsPerPage);
 }
