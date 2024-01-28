@@ -5,7 +5,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Crawler.Application.Crawler.Queries;
+namespace Crawler.Application.Crawler.Queries.GetWordsAndImagesFromPage;
 
 public class GetWordsAndImagesFromPageQueryHandler : IRequestHandler<GetWordsAndImagesFromPageQuery, ErrorOr<GetWordsAndImagesFromPageQueryResponse>>
 {
@@ -37,7 +37,7 @@ public class GetWordsAndImagesFromPageQueryHandler : IRequestHandler<GetWordsAnd
         };
     }
 
-    private IDictionary<string, int> GetTopWords(IEnumerable<string> words)
+    private Dictionary<string, int> GetTopWords(IEnumerable<string> words)
     {
         var wordWithCountDictionary = new Dictionary<string, int>();
 

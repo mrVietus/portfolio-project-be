@@ -7,10 +7,16 @@ using Microsoft.Extensions.Logging;
 
 namespace Crawler.Application.Services;
 
-public class CrawlingService : ICrawlingService
+public partial class CrawlingService : ICrawlingService
 {
     private readonly ILogger<CrawlingService> _logger;
     private readonly HtmlWeb _webClient;
+
+    [GeneratedRegex(@"\b[a-zA-Z]{2,}\b")]
+    private static partial Regex WordRegex();
+
+    [GeneratedRegex(@"\d")]
+    private static partial Regex DigitRegex();
 
     public CrawlingService(ILogger<CrawlingService> logger, HtmlWeb htmlWeb)
     {
@@ -43,7 +49,7 @@ public class CrawlingService : ICrawlingService
 
     private List<string> GetImageUrls(string url, HtmlDocument document)
     {
-        List<string> imageUrls = new();
+        List<string> imageUrls = [];
 
         var imageNodes = document.DocumentNode.SelectNodes("//img");
         if (imageNodes == null || imageNodes.Count <= 0)
@@ -70,7 +76,7 @@ public class CrawlingService : ICrawlingService
 
     private static string CleanUrlForOutput(string url)
     {
-        if (url.EndsWith("/"))
+        if (url.EndsWith('/'))
         {
             var sb = new StringBuilder(url);
             sb.Remove(sb.Length - 1, 1);
@@ -90,7 +96,7 @@ public class CrawlingService : ICrawlingService
 
     private List<string> GetAllWordsFromPage(string url, HtmlDocument document)
     {
-        List<string> wordList = new();
+        List<string> wordList = [];
 
         var textNodes = document.DocumentNode.SelectNodes("//text()[not(parent::script) and not(parent::style)]");
         if (textNodes == null || textNodes.Count <= 0)
@@ -113,10 +119,10 @@ public class CrawlingService : ICrawlingService
 
     private static List<string> GetWordsFromHtmlNode(HtmlNode node)
     {
-        return Regex.Matches(node.InnerText, @"\b[a-zA-Z]{2,}\b")
+        return WordRegex().Matches(node.InnerText)
             .Cast<Match>()
             .Select(m => m.Value)
-            .Where(w => !w.ToLower().Contains("nbsp") && !Regex.IsMatch(w, @"\d"))
+            .Where(w => !w.Contains("nbsp", StringComparison.InvariantCultureIgnoreCase) && !DigitRegex().IsMatch(w))
             .ToList();
     }
 }

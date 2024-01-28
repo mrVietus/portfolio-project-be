@@ -3,7 +3,7 @@ using Crawler.Domain.Entities.Base;
 
 namespace Crawler.Domain.Entities;
 
-public class CrawlResult : AuditData
+public class CrawlResultEntity : AuditData
 {
     private readonly char _delimiter = ',';
 
@@ -14,12 +14,12 @@ public class CrawlResult : AuditData
     public int PageWordsCount { get; private set; }
     public DateTime CapturedAt { get; private set; }
 
-    public Crawl Crawl { get; set; }
+    public CrawlEntity Crawl { get; set; }
     public Guid CrawlId { get; set; }
 
-    public CrawlResult() { }
+    public CrawlResultEntity() { }
 
-    public CrawlResult(string url, IEnumerable<string> images, IDictionary<string, int> topWords,
+    public CrawlResultEntity(string url, IEnumerable<string> images, IDictionary<string, int> topWords,
         int pageWordsCount, DateTime capturedAt)
     {
         Id = Guid.NewGuid();

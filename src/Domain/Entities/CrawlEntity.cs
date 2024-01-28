@@ -2,17 +2,17 @@
 
 namespace Crawler.Domain.Entities;
 
-public class Crawl : AuditData
+public class CrawlEntity : AuditData
 {
     public Guid Id { get; private set; }
     public string Name { get; private set; }
 
-    public CrawlResult CrawlResult { get; set; }
+    public CrawlResultEntity CrawlResult { get; set; }
     public Guid CrawlResultId { get; set; }
 
-    public Crawl() { }
+    public CrawlEntity() { }
 
-    public Crawl(string name, CrawlResult crawlResult)
+    public CrawlEntity(string name, CrawlResultEntity crawlResult)
     {
         Id = Guid.NewGuid();
 

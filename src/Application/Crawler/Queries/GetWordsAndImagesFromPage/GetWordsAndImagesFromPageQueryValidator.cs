@@ -2,7 +2,7 @@
 using Crawler.Domain.Messages;
 using FluentValidation;
 
-namespace Crawler.Application.Crawler.Queries;
+namespace Crawler.Application.Crawler.Queries.GetWordsAndImagesFromPage;
 
 [ExcludeFromCodeCoverage]
 public class GetWordsAndImagesFromPageQueryValidator : AbstractValidator<GetWordsAndImagesFromPageQuery>
