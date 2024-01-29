@@ -28,7 +28,6 @@ public static class DependencyInjection
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
         services.AddTransient<ICrawlingService, CrawlingService>();
-        services.AddTransient<ICacheService, MemoryCacheService>();
         services.AddTransient<HtmlWeb>();
 
         services.Configure<CrawlerSettings>(configuration.GetSection(CrawlerSettings.SectionName));

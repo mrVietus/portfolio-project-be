@@ -1,8 +1,8 @@
-﻿using Crawler.Application.Services;
+﻿using Crawler.Infrastructure.Cache;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
-namespace Crawler.Application.Tests.Services;
+namespace Crawler.Application.Tests.Cache;
 
 [TestFixture]
 public class MemoryCacheServiceTests
