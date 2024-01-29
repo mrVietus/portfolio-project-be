@@ -4,16 +4,39 @@ using Crawler.FunctionHandler.Mappings;
 using Crawler.FunctionHandler.Middleware;
 using Crawler.Infrastructure;
 using Crawler.Infrastructure.Persistance.Database.Migrations.HostExtensions;
+using Microsoft.Azure.Functions.Worker.Extensions.OpenApi.Extensions;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Abstractions;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Configurations;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 var host = new HostBuilder()
-    .ConfigureFunctionsWorkerDefaults(workerApplication =>
-    {
-        workerApplication.UseMiddleware<ResponseCorsMiddleware>();
-    })
+    .ConfigureFunctionsWorkerDefaults(
+        (context, builder) =>
+        {
+            builder.UseMiddleware<ResponseCorsMiddleware>();
+
+            var environment = context.HostingEnvironment.IsProduction()
+                ? string.Empty
+                : $"[{context.HostingEnvironment.EnvironmentName}]";
+
+            builder.Services.AddSingleton<IOpenApiConfigurationOptions>(
+                new OpenApiConfigurationOptions
+                {
+                    Info = new() { Version = "v1", Title = environment, },
+                    Servers = DefaultOpenApiConfigurationOptions.GetHostNames(),
+                    OpenApiVersion = OpenApiVersionType.V3,
+                    IncludeRequestingHostName = true,
+                    ForceHttps = !context.HostingEnvironment.IsDevelopment(),
+                    ForceHttp = false
+                }
+            );
+        }
+    )
+    .ConfigureOpenApi()
     .ConfigureServices(
         (context, services) =>
         {

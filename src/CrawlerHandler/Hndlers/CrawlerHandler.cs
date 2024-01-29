@@ -1,4 +1,6 @@
 using System;
+using System.Net;
+using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
 using Crawler.Application.Common;
@@ -7,12 +9,14 @@ using Crawler.Application.Crawler.Commands.RemoveCrawl;
 using Crawler.Application.Crawler.Commands.SaveCrawl;
 using Crawler.Application.Crawler.Queries.GetCrawls;
 using Crawler.Application.Crawler.Queries.GetWordsAndImagesFromPage;
+using Crawler.Domain.Models;
 using Crawler.FunctionHandler.Errors;
 using Crawler.FunctionHandler.Models;
 using MapsterMapper;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Extensions.Logging;
 
 namespace Crawler.FunctionHandler.Hndlers;
@@ -33,6 +37,19 @@ internal class CrawlerHandler : BaseHandler
     }
 
     [Function(Constants.CrawlPageFunctionName)]
+    [OpenApiOperation(operationId: Constants.CrawlPageFunctionName)]
+    [OpenApiParameter(
+        "url",
+        Type = typeof(string),
+        Required = true,
+        Description = "Url of of page that user wants to crawl."
+    )]
+    [OpenApiResponseWithBody(
+        HttpStatusCode.OK,
+        MediaTypeNames.Application.Json,
+        typeof(GetWordsAndImagesFromPageQueryResponse),
+        Description = "Crawled page data."
+    )]
     public async Task<HttpResponseData> CrawlAsync(
         [HttpTrigger(AuthorizationLevel.Function, "get", Route = Constants.CrawlPageFunctionRoute)]
         HttpRequestData request, string url, CancellationToken cancellationToken)
@@ -60,11 +77,42 @@ internal class CrawlerHandler : BaseHandler
     }
 
     [Function(Constants.GetCrawlsFunctionName)]
+    [OpenApiOperation(operationId: Constants.GetCrawlsFunctionName)]
+    [OpenApiParameter(
+        "pageNumber",
+        Type = typeof(int),
+        Required = true,
+        Description = "Number of page in pagination."
+    )]
+    [OpenApiParameter(
+        "itemsPerPage",
+        Type = typeof(int),
+        Required = true,
+        Description = "Number of items per page that we return in pagination."
+    )]
+    [OpenApiResponseWithBody(
+        HttpStatusCode.OK,
+        MediaTypeNames.Application.Json,
+        typeof(GetCrawlsQueryResponse),
+        Description = "Return all the crawls from db paginated."
+    )]
     public async Task<HttpResponseData> GetCrawlsAsync(
         [HttpTrigger(AuthorizationLevel.Function, "get", Route = Constants.GetCrawlsFunctionRoute)]
-        HttpRequestData request, int pageNumber, int itemsPerPage, CancellationToken cancellationToken)
+        HttpRequestData request, string pageNumber, string itemsPerPage, CancellationToken cancellationToken)
     {
-        var query = new GetCrawlsQuery(pageNumber, itemsPerPage);
+        if (!int.TryParse(pageNumber, out int page))
+        {
+            _logger.LogWarning("GetCrawlsAsync received wrong pageNumber in parameter. Not able to parse to int.");
+            return await ProblemAsync(request, ApiErrors.WrongDataProvided, cancellationToken);
+        }
+
+        if (!int.TryParse(itemsPerPage, out int pageItemsCount))
+        {
+            _logger.LogWarning("GetCrawlsAsync received wrong itemsPerPage in parameter. Not able to parse to int.");
+            return await ProblemAsync(request, ApiErrors.WrongDataProvided, cancellationToken);
+        }
+
+        var query = new GetCrawlsQuery(page, pageItemsCount);
         var queryResult = await _sender.Send(query, cancellationToken);
 
         return queryResult.IsError ?
@@ -73,6 +121,14 @@ internal class CrawlerHandler : BaseHandler
     }
 
     [Function(Constants.CreateCrawlFunctionName)]
+    [OpenApiOperation(operationId: Constants.CreateCrawlFunctionName)]
+    [OpenApiRequestBody(MediaTypeNames.Application.Json, typeof(SaveCrawlRequest))]
+    [OpenApiResponseWithBody(
+        HttpStatusCode.Created,
+        MediaTypeNames.Application.Json,
+        typeof(Crawl),
+        Description = "Return new crawl that was created into crawls database."
+    )]
     public async Task<HttpResponseData> CreateCrawlAsync(
         [HttpTrigger(AuthorizationLevel.Function, "put", Route = Constants.CreateCrawlFunctionRoute)]
         HttpRequestData request, CancellationToken cancellationToken)
@@ -89,15 +145,34 @@ internal class CrawlerHandler : BaseHandler
 
         return commandResult.IsError ?
             await ProblemAsync(request, commandResult.Errors, cancellationToken) :
-            await OkAsync(request, commandResult.Value, cancellationToken);
+            await CreatedAsync(request, commandResult.Value, cancellationToken);
     }
 
     [Function(Constants.DeleteCrawlFunctionName)]
+    [OpenApiOperation(operationId: Constants.DeleteCrawlFunctionName)]
+    [OpenApiParameter(
+        "id",
+        Type = typeof(Guid),
+        Required = true,
+        Description = "Id of existing Crawl that we want to remove from database."
+    )]
+    [OpenApiResponseWithBody(
+        HttpStatusCode.OK,
+        MediaTypeNames.Application.Json,
+        typeof(bool),
+        Description = "Returns true if Crawl with Id was properly removed from database."
+    )]
     public async Task<HttpResponseData> DeleteCrawlsAsync(
         [HttpTrigger(AuthorizationLevel.Function, "delete", Route = Constants.DeleteCrawlFunctionRoute)]
-        HttpRequestData request, Guid id, CancellationToken cancellationToken)
+        HttpRequestData request, string id, CancellationToken cancellationToken)
     {
-        var command = new RemoveCrawlCommand(id);
+        if (!Guid.TryParse(id, out Guid crawlId))
+        {
+            _logger.LogWarning("DeleteCrawlsAsync received wrong id in parameter. Not able to parse to Guid.");
+            return await ProblemAsync(request, ApiErrors.IdIsNotCorrectValue, cancellationToken);
+        }
+
+        var command = new RemoveCrawlCommand(crawlId);
         var commandResult = await _sender.Send(command, cancellationToken);
 
         return commandResult.IsError ?

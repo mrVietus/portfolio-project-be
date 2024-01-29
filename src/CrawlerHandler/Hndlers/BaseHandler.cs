@@ -75,6 +75,15 @@ internal class BaseHandler
         return response;
     }
 
+    public virtual async Task<HttpResponseData> CreatedAsync(HttpRequestData request, object value, CancellationToken cancellationToken = default)
+    {
+        var response = request.CreateResponse();
+        await response.WriteAsJsonAsync(value, cancellationToken);
+        response.StatusCode = HttpStatusCode.Created;
+
+        return response;
+    }
+
     public virtual async Task<HttpResponseData> ProblemAsync(
         HttpRequestData request,
         string detail = null,
