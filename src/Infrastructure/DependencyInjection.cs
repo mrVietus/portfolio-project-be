@@ -1,4 +1,6 @@
-﻿using Crawler.Application.Common.Interfaces.Repositories;
+﻿using Crawler.Application.Common.Interfaces;
+using Crawler.Application.Common.Interfaces.Repositories;
+using Crawler.Infrastructure.Cache;
 using Crawler.Infrastructure.Persistance.DataAccess.Repositories;
 using Crawler.Infrastructure.Persistance.Database;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +18,8 @@ public static class DependencyInjection
             configuration.GetConnectionString("CrawlerDatabase")));
 
         services.AddScoped<ICrawlEfRepository, CrawlEfRepository>();
+
+        services.AddTransient<ICacheService, MemoryCacheService>();
 
         return services;
     }

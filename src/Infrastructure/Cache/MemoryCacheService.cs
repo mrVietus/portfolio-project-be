@@ -3,7 +3,7 @@ using Crawler.Application.Common.Settings;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
-namespace Crawler.Application.Services;
+namespace Crawler.Infrastructure.Cache;
 
 public class MemoryCacheService : ICacheService
 {
