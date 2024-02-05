@@ -29,4 +29,15 @@ public class CrawlEfRepository(ApplicationDbContext context) : EntityFrameworkRe
         var crawlData = await query.ToListAsync();
         return crawlData;
     }
+
+    public async Task<CrawlEntity?> GetCrawlByIdWithCrawlResultAsync(Guid id)
+    {
+        var query = DbSet
+            .Include(x => x.CrawlResult)
+            .Where(x => x.Id == id)
+            .AsQueryable();
+
+        var crawlEntity = await query.SingleOrDefaultAsync();
+        return crawlEntity;
+    }
 }
