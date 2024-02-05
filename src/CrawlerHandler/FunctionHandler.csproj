@@ -8,21 +8,21 @@
   </PropertyGroup>
   <ItemGroup>
 	<FrameworkReference Include="Microsoft.AspNetCore.App" />
-	<PackageReference Include="Mapster"/>
-	<PackageReference Include="Mapster.DependencyInjection"/>
-	<PackageReference Include="Microsoft.Azure.Functions.Worker"/>
+	<PackageReference Include="Mapster" />
+	<PackageReference Include="Mapster.DependencyInjection" />
+	<PackageReference Include="Microsoft.Azure.Functions.Worker" />
 	<PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk">
 		<PrivateAssets>all</PrivateAssets>
 		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	</PackageReference>
-	<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http"/>
-	<PackageReference Include="Microsoft.Extensions.Logging"/>
-	<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets"/>
+	<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" />
+	<PackageReference Include="Microsoft.Extensions.Logging" />
+	<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" />
 	<PackageReference Include="Microsoft.EntityFrameworkCore.Design">
 		<PrivateAssets>all</PrivateAssets>
 		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	</PackageReference>
-	<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.OpenApi"/>
+	<PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.OpenApi" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />

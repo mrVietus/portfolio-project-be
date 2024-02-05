@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using Crawler.Application;
 using Crawler.FunctionHandler.Mappings;
-using Crawler.FunctionHandler.Middleware;
 using Crawler.Infrastructure;
 using Crawler.Infrastructure.Persistance.Database.Migrations.HostExtensions;
 using Microsoft.Azure.Functions.Worker.Extensions.OpenApi.Extensions;
@@ -17,8 +16,6 @@ var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults(
         (context, builder) =>
         {
-            builder.UseMiddleware<ResponseCorsMiddleware>();
-
             var environment = context.HostingEnvironment.IsProduction()
                 ? string.Empty
                 : $"[{context.HostingEnvironment.EnvironmentName}]";
