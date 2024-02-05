@@ -23,7 +23,7 @@ public class CrawlEfRepository(ApplicationDbContext context) : EntityFrameworkRe
             .Include(x => x.CrawlResult)
             .Skip(numberOfSkippedItems)
             .Take(itemsPerPage)
-            .OrderBy(x => x.Created)
+            .OrderByDescending(x => x.Created)
             .AsQueryable();
 
         var crawlData = await query.ToListAsync();
