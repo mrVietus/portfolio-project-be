@@ -7,11 +7,13 @@ using Crawler.Application.Common;
 using Crawler.Application.Common.Interfaces;
 using Crawler.Application.Crawler.Commands.RemoveCrawl;
 using Crawler.Application.Crawler.Commands.SaveCrawl;
+using Crawler.Application.Crawler.Queries.GetCrawlById;
 using Crawler.Application.Crawler.Queries.GetCrawls;
 using Crawler.Application.Crawler.Queries.GetWordsAndImagesFromPage;
 using Crawler.Domain.Models;
 using Crawler.FunctionHandler.Errors;
 using Crawler.FunctionHandler.Models;
+using ErrorOr;
 using MapsterMapper;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
@@ -74,6 +76,45 @@ internal class CrawlerHandler : BaseHandler
             async result => await CacheResponseAndRespondOkAsync(url, result, request, cancellationToken),
             async errors => await ProblemAsync(request, errors, cancellationToken)
         );
+    }
+
+    [Function("GetCrawlById")]
+    [OpenApiOperation(operationId: "GetCrawlById")]
+    [OpenApiParameter(
+       "id",
+       Type = typeof(string),
+       Required = true,
+       Description = "Guid id passed as a string."
+   )]
+    [OpenApiResponseWithBody(
+       HttpStatusCode.OK,
+       MediaTypeNames.Application.Json,
+       typeof(GetCrawlsQueryResponse),
+       Description = "Return crawl from db by id."
+   )]
+    public async Task<HttpResponseData> GetCrawlByIdAsync(
+       [HttpTrigger(AuthorizationLevel.Function, "get", Route = "crawl/{id}")]
+        HttpRequestData request, string id, CancellationToken cancellationToken)
+    {
+        if (!Guid.TryParse(id, out Guid crawlId))
+        {
+            _logger.LogWarning("GetCrawlByIdAsync received wrong id in parameter. Not able to parse to Guid.");
+            return await ProblemAsync(request, ApiErrors.WrongDataProvided, cancellationToken);
+        }
+
+        var cachedValue = _cacheService.GetFromCache<Crawl>(id);
+        if (cachedValue != null)
+        {
+            _logger.LogInformation("Got response from CACHE for GetCrawlByIdAsync - Id: {id}.", id);
+            return await OkAsync(request, cachedValue, cancellationToken);
+        }
+
+        var query = new GetCrawlByIdQuery(crawlId);
+        var queryResult = await _sender.Send(query, cancellationToken);
+
+        return queryResult.IsError ?
+            await ProblemAsync(request, queryResult.Errors, cancellationToken) :
+            await CacheResponseAndRespondOkAsync(id, queryResult.Value, request, cancellationToken);
     }
 
     [Function(Constants.GetCrawlsFunctionName)]
