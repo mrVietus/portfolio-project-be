@@ -60,15 +60,12 @@ This layer is a ASP.NET Core MVC / Razor Pages application. This layer depends o
 
 In the `FunctionHandler` project we have `local.settings.json` file.
 
-* Configure the `Crawler:AllowedOrigin` property with the frontend url like this:
-
 ```json
 {
     "IsEncrypted": false,
     "Values": {
         "AzureWebJobsStorage": "UseDevelopmentStorage=true",
         "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
-        "Crawler:AllowedOrigin": "http://localhost:5173",
         "Crawler:CacheItemsTimeSpanInDays": 1,
         "Crawler:CountOfTopWordsThatWillBeReturned": 15
     },
