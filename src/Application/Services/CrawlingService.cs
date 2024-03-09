@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 using Crawler.Application.Common.Interfaces;
-using Crawler.Domain.Models;
+using Crawler.Application.Models;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
 

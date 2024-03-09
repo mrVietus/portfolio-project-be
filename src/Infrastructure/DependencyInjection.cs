@@ -21,6 +21,8 @@ public static class DependencyInjection
 
         services.AddTransient<ICacheService, MemoryCacheService>();
 
+        services.AddSingleton(TimeProvider.System);
+
         return services;
     }
 }

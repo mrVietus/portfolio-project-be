@@ -1,8 +1,8 @@
-﻿using Crawler.Domain.Models;
+﻿using Crawler.Application.Models;
 
 namespace Crawler.Application.Crawler.Queries.GetCrawls;
 
 public class GetCrawlsQueryResponse
 {
-    public IEnumerable<Crawl> Crawls { get; set; } = Enumerable.Empty<Crawl>();
+    public IEnumerable<Crawl> Crawls { get; set; } = [];
 }

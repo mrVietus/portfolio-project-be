@@ -1,4 +1,4 @@
-﻿using Crawler.Domain.Models;
+﻿using Crawler.Application.Models;
 using ErrorOr;
 using MediatR;
 

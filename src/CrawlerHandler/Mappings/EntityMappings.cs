@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Crawler.Application.Crawler.Queries.GetCrawls;
+using Crawler.Application.Models;
 using Crawler.Domain.Entities;
-using Crawler.Domain.Models;
 using Mapster;
 
 namespace Crawler.FunctionHandler.Mappings;
