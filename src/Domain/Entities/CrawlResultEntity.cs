@@ -3,26 +3,25 @@ using Crawler.Domain.Entities.Base;
 
 namespace Crawler.Domain.Entities;
 
-public class CrawlResultEntity : AuditData
+public sealed class CrawlResultEntity : Entity
 {
     private readonly char _delimiter = ',';
 
-    public Guid Id { get; private set; }
-    public string Url { get; private set; }
-    public string Images { get; private set; }
-    public string TopWordsJson { get; private set; }
-    public int PageWordsCount { get; private set; }
-    public DateTime CapturedAt { get; private set; }
+    public string Url { get; init; }
+    public string Images { get; init; }
+    public string TopWordsJson { get; init; }
+    public int PageWordsCount { get; init; }
+    public DateTime CapturedAt { get; init; }
 
-    public CrawlEntity Crawl { get; set; }
-    public Guid CrawlId { get; set; }
+    public CrawlEntity? Crawl { get; init; }
+    public Guid? CrawlId { get; init; }
 
-    public CrawlResultEntity() { }
+    private CrawlResultEntity() { }
 
-    public CrawlResultEntity(string url, IEnumerable<string> images, IDictionary<string, int> topWords,
-        int pageWordsCount, DateTime capturedAt)
+    public CrawlResultEntity(Guid id, string url, IEnumerable<string> images, IDictionary<string, int> topWords,
+        int pageWordsCount, DateTime capturedAt, DateTime creationDate) 
+        : base(id, creationDate)
     {
-        Id = Guid.NewGuid();
         Url = url;
         Images = images.Any() ?
             string.Join(_delimiter, images) : string.Empty;
@@ -35,11 +34,10 @@ public class CrawlResultEntity : AuditData
     {
         if (string.IsNullOrWhiteSpace(Images))
         {
-            return Enumerable.Empty<string>();
+            return [];
         }
 
-        return Images.Split(_delimiter)
-            .ToList();
+        return [.. Images.Split(_delimiter)];
     }
 
     public IDictionary<string, int>? GetTopWordsAsDictionary()

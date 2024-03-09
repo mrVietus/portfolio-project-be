@@ -1,7 +1,7 @@
 ﻿using Crawler.Application.Common.Interfaces.Repositories;
+using Crawler.Application.Models;
 using Crawler.Domain.Entities;
 using Crawler.Domain.Errors;
-using Crawler.Domain.Models;
 using ErrorOr;
 using MapsterMapper;
 using MediatR;
@@ -13,12 +13,14 @@ internal class SaveCrawlCommandHandler : IRequestHandler<SaveCrawlCommand, Error
 {
     private readonly ICrawlEfRepository _crawlEfRepository;
     private readonly IMapper _mapper;
+    private readonly TimeProvider _timeProvider;
     private readonly ILogger<SaveCrawlCommandHandler> _logger;
 
-    public SaveCrawlCommandHandler(ICrawlEfRepository crawlEfRepository, IMapper mapper, ILogger<SaveCrawlCommandHandler> logger)
+    public SaveCrawlCommandHandler(ICrawlEfRepository crawlEfRepository, IMapper mapper, TimeProvider timeProvider, ILogger<SaveCrawlCommandHandler> logger)
     {
         _crawlEfRepository = crawlEfRepository;
         _mapper = mapper;
+        _timeProvider = timeProvider;
         _logger = logger;
     }
 
@@ -31,8 +33,10 @@ internal class SaveCrawlCommandHandler : IRequestHandler<SaveCrawlCommand, Error
             return Errors.Crawl.CrawlAlreadyExists;
         }
 
-        var crawlResultEntity = new CrawlResultEntity(command.Url, command.Images, command.TopWords, command.PageWordsCount, command.CapturedAt);
-        var crawlEntity = new CrawlEntity(command.Name, crawlResultEntity);
+        var creationDate = _timeProvider.GetUtcNow().DateTime;
+
+        var crawlResultEntity = new CrawlResultEntity(Guid.NewGuid(), command.Url, command.Images, command.TopWords, command.PageWordsCount, command.CapturedAt, creationDate);
+        var crawlEntity = new CrawlEntity(Guid.NewGuid(), command.Name, crawlResultEntity, creationDate);
 
         await _crawlEfRepository.InsertAsync(crawlEntity);
         await _crawlEfRepository.SaveAsync();

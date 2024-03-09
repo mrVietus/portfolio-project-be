@@ -1,4 +1,4 @@
-﻿using Crawler.Domain.Models;
+﻿using Crawler.Application.Models;
 
 namespace Crawler.Application.Common.Interfaces;
 

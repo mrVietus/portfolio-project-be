@@ -1,7 +1,7 @@
 ﻿using AutoFixture;
 using Crawler.Application.Common.Interfaces;
 using Crawler.Application.Crawler.Queries.GetWordsAndImagesFromPage;
-using Crawler.Domain.Models;
+using Crawler.Application.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute.ExceptionExtensions;

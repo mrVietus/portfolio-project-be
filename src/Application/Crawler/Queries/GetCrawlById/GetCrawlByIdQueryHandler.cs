@@ -1,6 +1,6 @@
 ﻿using Crawler.Application.Common.Interfaces.Repositories;
+using Crawler.Application.Models;
 using Crawler.Domain.Errors;
-using Crawler.Domain.Models;
 using ErrorOr;
 using MapsterMapper;
 using MediatR;
