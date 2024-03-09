@@ -2,7 +2,7 @@
 
 public sealed class CrawlResult
 {
-    public IEnumerable<string> ImageUrls { get; set; } = [];
-    public IEnumerable<string> Words { get; set; } = [];
+    public IEnumerable<string> ImageUrls { get; init; } = [];
+    public IEnumerable<string> Words { get; init; } = [];
     public int WordsCount => Words.Count();
 }

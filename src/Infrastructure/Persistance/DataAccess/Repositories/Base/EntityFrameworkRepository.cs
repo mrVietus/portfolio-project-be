@@ -4,16 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Crawler.Infrastructure.Persistance.DataAccess.Repositories.Base;
 
-public class EntityFrameworkRepository<TEntity> : IRepository<TEntity> where TEntity : class
+public class EntityFrameworkRepository<TEntity>(DbContext context) 
+    : IRepository<TEntity> where TEntity : class
 {
-    protected DbContext Context { get; }
-    protected DbSet<TEntity> DbSet { get; }
-
-    public EntityFrameworkRepository(DbContext context)
-    {
-        Context = context;
-        DbSet = context.Set<TEntity>();
-    }
+    protected DbContext Context { get; } = context;
+    protected DbSet<TEntity> DbSet { get; } = context.Set<TEntity>();
 
     public async Task<IList<TEntity>> GetAsync(
         Expression<Func<TEntity, bool>>? filter = null,

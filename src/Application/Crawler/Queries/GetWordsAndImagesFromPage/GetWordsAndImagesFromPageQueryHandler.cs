@@ -7,26 +7,18 @@ using Microsoft.Extensions.Options;
 
 namespace Crawler.Application.Crawler.Queries.GetWordsAndImagesFromPage;
 
-public class GetWordsAndImagesFromPageQueryHandler : IRequestHandler<GetWordsAndImagesFromPageQuery, ErrorOr<GetWordsAndImagesFromPageQueryResponse>>
+public class GetWordsAndImagesFromPageQueryHandler(ICrawlingService crawlingService, ILogger<GetWordsAndImagesFromPageQueryHandler> logger, IOptions<CrawlerSettings> options) 
+    : IRequestHandler<GetWordsAndImagesFromPageQuery, ErrorOr<GetWordsAndImagesFromPageQueryResponse>>
 {
-    private readonly ICrawlingService _crawlingService;
-    private readonly ILogger<GetWordsAndImagesFromPageQueryHandler> _logger;
-    private readonly int _numberOfTopWords;
-
-    public GetWordsAndImagesFromPageQueryHandler(ICrawlingService crawlingService, ILogger<GetWordsAndImagesFromPageQueryHandler> logger, IOptions<CrawlerSettings> options)
-    {
-        _crawlingService = crawlingService;
-        _logger = logger;
-        _numberOfTopWords = options.Value.CountOfTopWordsThatWillBeReturned;
-    }
+    private readonly int _numberOfTopWords = options.Value.CountOfTopWordsThatWillBeReturned;
 
     public async Task<ErrorOr<GetWordsAndImagesFromPageQueryResponse>> Handle(GetWordsAndImagesFromPageQuery query, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Trying to get all the images and top {count} words from the URL: {url}.", _numberOfTopWords, query.Url);
+        logger.LogInformation("Trying to get all the images and top {count} words from the URL: {url}.", _numberOfTopWords, query.Url);
 
-        var crawlingResult = await _crawlingService.CrawlAsync(query.Url, cancellationToken);
+        var crawlingResult = await crawlingService.CrawlAsync(query.Url, cancellationToken);
 
-        _logger.LogInformation("Images and words received successfully from the URL: {url}.", query.Url);
+        logger.LogInformation("Images and words received successfully from the URL: {url}.", query.Url);
 
         return new GetWordsAndImagesFromPageQueryResponse()
         {
@@ -46,9 +38,9 @@ public class GetWordsAndImagesFromPageQueryHandler : IRequestHandler<GetWordsAnd
 
         foreach (var word in words)
         {
-            if (wordWithCountDictionary.ContainsKey(word))
+            if (wordWithCountDictionary.TryGetValue(word, out int value))
             {
-                wordWithCountDictionary[word]++;
+                wordWithCountDictionary[word] = ++value;
                 continue;
             }
 

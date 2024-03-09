@@ -35,8 +35,7 @@ public class CrawlResultEntityTypeConfiguration : IEntityTypeConfiguration<Crawl
 
         builder
             .Property(e => e.Created)
-            .IsRequired(true)
-            .HasDefaultValueSql("getdate()");
+            .IsRequired(true);
 
         builder
             .Property(e => e.Updated)
