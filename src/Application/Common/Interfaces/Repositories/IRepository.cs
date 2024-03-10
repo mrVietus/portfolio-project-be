@@ -30,6 +30,4 @@ public interface IRepository<TEntity> where TEntity : class
 
     void Delete(TEntity entityToDelete);
     void DeleteRange(IEnumerable<TEntity> entitiesToDelete);
-
-    Task SaveAsync();
 }

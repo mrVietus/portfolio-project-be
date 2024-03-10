@@ -5,20 +5,13 @@ using Microsoft.Extensions.Options;
 
 namespace Crawler.Infrastructure.Cache;
 
-public class MemoryCacheService : ICacheService
+public class MemoryCacheService(IMemoryCache memoryCache, IOptions<CrawlerSettings> options) : ICacheService
 {
-    private readonly int _expirationTimeInDays;
-    private readonly IMemoryCache _memoryCache;
-
-    public MemoryCacheService(IMemoryCache memoryCache, IOptions<CrawlerSettings> options)
-    {
-        _expirationTimeInDays = options.Value.CacheItemsTimeSpanInDays;
-        _memoryCache = memoryCache;
-    }
+    private readonly int _expirationTimeInDays = options.Value.CacheItemsTimeSpanInDays;
 
     public T? GetFromCache<T>(string key)
     {
-        if (_memoryCache.TryGetValue(key, out T? value))
+        if (memoryCache.TryGetValue(key, out T? value))
         {
             return value;
         }
@@ -31,6 +24,6 @@ public class MemoryCacheService : ICacheService
         var options = new MemoryCacheEntryOptions()
             .SetAbsoluteExpiration(TimeSpan.FromDays(_expirationTimeInDays));
 
-        _memoryCache.Set(key, value, options);
+        memoryCache.Set(key, value, options);
     }
 }

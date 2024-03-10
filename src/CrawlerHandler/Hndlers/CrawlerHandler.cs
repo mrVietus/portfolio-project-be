@@ -22,21 +22,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Crawler.FunctionHandler.Hndlers;
 
-internal class CrawlerHandler : BaseHandler
+internal class CrawlerHandler(ICacheService cacheService, ISender sender, IMapper mapper, ILogger<CrawlerHandler> logger) : BaseHandler
 {
-    private readonly ICacheService _cacheService;
-    private readonly ISender _sender;
-    private readonly IMapper _mapper;
-    private readonly ILogger<CrawlerHandler> _logger;
-
-    public CrawlerHandler(ICacheService cacheService, ISender sender, IMapper mapper, ILogger<CrawlerHandler> logger)
-    {
-        _cacheService = cacheService;
-        _sender = sender;
-        _mapper = mapper;
-        _logger = logger;
-    }
-
     [Function(Constants.CrawlPageFunctionName)]
     [OpenApiOperation(operationId: Constants.CrawlPageFunctionName)]
     [OpenApiParameter(
@@ -57,19 +44,19 @@ internal class CrawlerHandler : BaseHandler
     {
         if (string.IsNullOrWhiteSpace(url))
         {
-            _logger.LogWarning("CrawlAsync: No URL provided in query parameters.");
+            logger.LogWarning("CrawlAsync: No URL provided in query parameters.");
             return await ProblemAsync(request, ApiErrors.MissingUrlQueryParameter, cancellationToken);
         }
 
-        var cachedValue = _cacheService.GetFromCache<GetWordsAndImagesFromPageQueryResponse>(url);
+        var cachedValue = cacheService.GetFromCache<GetWordsAndImagesFromPageQueryResponse>(url);
         if (cachedValue != null)
         {
-            _logger.LogInformation("Got response from CACHE for CrawlAsync - url: {url}.", url);
+            logger.LogInformation("Got response from CACHE for CrawlAsync - url: {url}.", url);
             return await OkAsync(request, cachedValue, cancellationToken);
         }
 
         var query = new GetWordsAndImagesFromPageQuery(url);
-        var queryResult = await _sender.Send(query, cancellationToken);
+        var queryResult = await sender.Send(query, cancellationToken);
 
         return await queryResult.MatchAsync(
             async result => await CacheResponseAndRespondOkAsync(url, result, request, cancellationToken),
@@ -97,19 +84,19 @@ internal class CrawlerHandler : BaseHandler
     {
         if (!Guid.TryParse(id, out Guid crawlId))
         {
-            _logger.LogWarning("GetCrawlByIdAsync received wrong id in parameter. Not able to parse to Guid.");
+            logger.LogWarning("GetCrawlByIdAsync received wrong id in parameter. Not able to parse to Guid.");
             return await ProblemAsync(request, ApiErrors.WrongDataProvided, cancellationToken);
         }
 
-        var cachedValue = _cacheService.GetFromCache<Crawl>(id);
+        var cachedValue = cacheService.GetFromCache<Crawl>(id);
         if (cachedValue != null)
         {
-            _logger.LogInformation("Got response from CACHE for GetCrawlByIdAsync - Id: {id}.", id);
+            logger.LogInformation("Got response from CACHE for GetCrawlByIdAsync - Id: {id}.", id);
             return await OkAsync(request, cachedValue, cancellationToken);
         }
 
         var query = new GetCrawlByIdQuery(crawlId);
-        var queryResult = await _sender.Send(query, cancellationToken);
+        var queryResult = await sender.Send(query, cancellationToken);
 
         return queryResult.IsError ?
             await ProblemAsync(request, queryResult.Errors, cancellationToken) :
@@ -142,18 +129,18 @@ internal class CrawlerHandler : BaseHandler
     {
         if (!int.TryParse(pageNumber, out int page))
         {
-            _logger.LogWarning("GetCrawlsAsync received wrong pageNumber in parameter. Not able to parse to int.");
+            logger.LogWarning("GetCrawlsAsync received wrong pageNumber in parameter. Not able to parse to int.");
             return await ProblemAsync(request, ApiErrors.WrongDataProvided, cancellationToken);
         }
 
         if (!int.TryParse(itemsPerPage, out int pageItemsCount))
         {
-            _logger.LogWarning("GetCrawlsAsync received wrong itemsPerPage in parameter. Not able to parse to int.");
+            logger.LogWarning("GetCrawlsAsync received wrong itemsPerPage in parameter. Not able to parse to int.");
             return await ProblemAsync(request, ApiErrors.WrongDataProvided, cancellationToken);
         }
 
         var query = new GetCrawlsQuery(page, pageItemsCount);
-        var queryResult = await _sender.Send(query, cancellationToken);
+        var queryResult = await sender.Send(query, cancellationToken);
 
         return queryResult.IsError ?
             await ProblemAsync(request, queryResult.Errors, cancellationToken) :
@@ -176,12 +163,12 @@ internal class CrawlerHandler : BaseHandler
         var requestData = TryDeserializeRequestBody<SaveCrawlRequest>(request.Body);
         if (requestData is null)
         {
-            _logger.LogWarning("CreateCrawlAsync received wrong object in body. Not able to deserialize.");
+            logger.LogWarning("CreateCrawlAsync received wrong object in body. Not able to deserialize.");
             return await ProblemAsync(request, ApiErrors.WrongBody, cancellationToken);
         }
 
-        var command = _mapper.Map<SaveCrawlCommand>(requestData);
-        var commandResult = await _sender.Send(command, cancellationToken);
+        var command = mapper.Map<SaveCrawlCommand>(requestData);
+        var commandResult = await sender.Send(command, cancellationToken);
 
         return commandResult.IsError ?
             await ProblemAsync(request, commandResult.Errors, cancellationToken) :
@@ -208,12 +195,12 @@ internal class CrawlerHandler : BaseHandler
     {
         if (!Guid.TryParse(id, out Guid crawlId))
         {
-            _logger.LogWarning("DeleteCrawlsAsync received wrong id in parameter. Not able to parse to Guid.");
+            logger.LogWarning("DeleteCrawlsAsync received wrong id in parameter. Not able to parse to Guid.");
             return await ProblemAsync(request, ApiErrors.IdIsNotCorrectValue, cancellationToken);
         }
 
         var command = new RemoveCrawlCommand(crawlId);
-        var commandResult = await _sender.Send(command, cancellationToken);
+        var commandResult = await sender.Send(command, cancellationToken);
 
         return commandResult.IsError ?
             await ProblemAsync(request, commandResult.Errors, cancellationToken) :
@@ -222,7 +209,7 @@ internal class CrawlerHandler : BaseHandler
 
     public async Task<HttpResponseData> CacheResponseAndRespondOkAsync<T>(string key, T value, HttpRequestData request, CancellationToken cancellationToken)
     {
-        _cacheService.SetCache(key, value);
+        cacheService.SetCache(key, value);
         return await OkAsync(request, value, cancellationToken);
     }
 }

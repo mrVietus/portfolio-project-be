@@ -4,16 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Crawler.Infrastructure.Persistance.DataAccess.Repositories.Base;
 
-public class EntityFrameworkRepository<TEntity> : IRepository<TEntity> where TEntity : class
+public class EntityFrameworkRepository<TEntity>(DbContext context) 
+    : IRepository<TEntity> where TEntity : class
 {
-    protected DbContext Context { get; }
-    protected DbSet<TEntity> DbSet { get; }
+    protected DbContext Context { get; } = context;
+    protected DbSet<TEntity> DbSet { get; } = context.Set<TEntity>();
 
-    public EntityFrameworkRepository(DbContext context)
-    {
-        Context = context;
-        DbSet = context.Set<TEntity>();
-    }
+    private static readonly char[] separator = [','];
 
     public async Task<IList<TEntity>> GetAsync(
         Expression<Func<TEntity, bool>>? filter = null,
@@ -106,11 +103,6 @@ public class EntityFrameworkRepository<TEntity> : IRepository<TEntity> where TEn
         DbSet.RemoveRange(entitiesToDelete);
     }
 
-    public Task SaveAsync()
-    {
-        return Context.SaveChangesAsync();
-    }
-
     private IQueryable<TEntity> GetQuery(
         Expression<Func<TEntity, bool>>? filter,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy,
@@ -123,7 +115,7 @@ public class EntityFrameworkRepository<TEntity> : IRepository<TEntity> where TEn
             query = query.Where(filter);
         }
 
-        query = includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+        query = includeProperties.Split(separator, StringSplitOptions.RemoveEmptyEntries)
             .Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
 
         if (orderBy != null)

@@ -33,7 +33,7 @@ public class GetWordsAndImagesFromPageQueryHandlerTests
     }
 
     [Test, AutoData]
-    public async Task Handle_WhenCrawlingSucceeds_ReturnsResponseWithUrlTopWordsAndImages(string url, CrawlResult crawlingResult, [Frozen] List<string> words)
+    public async Task Handle_WhenCrawlingSucceeds_ReturnsResponseWithUrlTopWordsAndImages(string url, [Frozen] List<string> urls, [Frozen] List<string> words)
     {
         // Arrange
         var fixture = new Fixture
@@ -41,7 +41,12 @@ public class GetWordsAndImagesFromPageQueryHandlerTests
             RepeatCount = 100
         };
         fixture.AddManyTo(words);
-        crawlingResult.Words = words;
+
+        var crawlingResult = new CrawlResult()
+        {
+            ImageUrls = urls,
+            Words = words
+        };
 
         var query = new GetWordsAndImagesFromPageQuery(url);
         var cancellationToken = new CancellationToken();
