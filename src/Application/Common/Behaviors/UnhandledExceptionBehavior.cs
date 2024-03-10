@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 namespace Crawler.Application.Common.Behaviors;
 
 [ExcludeFromCodeCoverage]
-public class UnhandledExceptionBehavior<TRequest, TResponse>(ILogger<TRequest> logger) :
+public sealed class UnhandledExceptionBehavior<TRequest, TResponse>(ILogger<TRequest> logger) :
     IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
 {
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)

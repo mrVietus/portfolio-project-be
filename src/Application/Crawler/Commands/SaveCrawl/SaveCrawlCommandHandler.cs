@@ -27,7 +27,6 @@ internal class SaveCrawlCommandHandler(ICrawlEfRepository crawlEfRepository, IMa
         var crawlEntity = new CrawlEntity(Guid.NewGuid(), command.Name, crawlResultEntity, creationDate);
 
         await crawlEfRepository.InsertAsync(crawlEntity);
-        await crawlEfRepository.SaveAsync();
 
         var commandResponse = mapper.Map<Crawl>(crawlEntity);
         return commandResponse;

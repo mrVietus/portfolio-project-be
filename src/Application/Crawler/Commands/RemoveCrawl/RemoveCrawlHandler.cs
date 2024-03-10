@@ -19,7 +19,6 @@ public class RemoveCrawlHandler(ICrawlEfRepository crawlEfRepository, ILogger<Re
         }
 
         crawlEfRepository.Delete(crawlEntity);
-        await crawlEfRepository.SaveAsync();
 
         logger.LogInformation("Crawl with Id: {Id} was found and removed.", command.Id);
         return true;

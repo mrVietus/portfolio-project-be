@@ -18,6 +18,7 @@ public static class DependencyInjection
             configuration.GetConnectionString("CrawlerDatabase")));
 
         services.AddScoped<ICrawlEfRepository, CrawlEfRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddTransient<ICacheService, MemoryCacheService>();
 
