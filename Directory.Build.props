@@ -1,12 +1,18 @@
 <Project>
 
-  <PropertyGroup>
-    <!-- https://aka.ms/vs-build-acceleration -->
-    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
-    <LangVersion>latestMajor</LangVersion>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <IsPackable>false</IsPackable>
-    <IsPublishable>false</IsPublishable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		
+		<LangVersion>latestMajor</LangVersion>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+		<IsPackable>false</IsPackable>
+		<IsPublishable>false</IsPublishable>
+		<AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+
+		<RootNamespace>Crawler.$(MSBuildProjectName)</RootNamespace>
+		<AssemblyName>Crawler.$(MSBuildProjectName)</AssemblyName>
+	</PropertyGroup>
 
 </Project>

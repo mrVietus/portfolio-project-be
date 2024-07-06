@@ -1,8 +1,5 @@
-using System;
 using System.Net;
 using System.Net.Mime;
-using System.Threading;
-using System.Threading.Tasks;
 using Crawler.Application.Common;
 using Crawler.Application.Common.Interfaces;
 using Crawler.Application.Crawler.Commands.RemoveCrawl;
