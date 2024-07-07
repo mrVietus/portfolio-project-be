@@ -21,12 +21,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure.Tests", "tes
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{275DF11C-0339-49E3-8246-C1A7BD63B8B3}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
 		nuget.config = nuget.config
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CleanArchitecture.Tests", "tests\CleanArchitecture.Tests\CleanArchitecture.Tests.csproj", "{D83FB7D4-503D-4AAA-9A79-0751B07502C3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,6 +61,10 @@ Global
 		{45639B69-3464-4877-BD24-1D536043D260}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45639B69-3464-4877-BD24-1D536043D260}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{45639B69-3464-4877-BD24-1D536043D260}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D83FB7D4-503D-4AAA-9A79-0751B07502C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D83FB7D4-503D-4AAA-9A79-0751B07502C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D83FB7D4-503D-4AAA-9A79-0751B07502C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D83FB7D4-503D-4AAA-9A79-0751B07502C3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,6 +76,7 @@ Global
 		{C9F74CE7-E3B1-430C-B803-6F22F9C8B5E9} = {A7E47B2E-E3FB-4804-A270-0469D42D016D}
 		{40DC8FDB-D7D3-4775-AC91-B0636F52F2AF} = {89089D66-E643-4E95-B6B4-2D8B8A57B1C1}
 		{45639B69-3464-4877-BD24-1D536043D260} = {A7E47B2E-E3FB-4804-A270-0469D42D016D}
+		{D83FB7D4-503D-4AAA-9A79-0751B07502C3} = {A7E47B2E-E3FB-4804-A270-0469D42D016D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C720A10-E021-45FD-A235-C7268802FF2C}

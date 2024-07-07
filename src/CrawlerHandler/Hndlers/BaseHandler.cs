@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using ErrorOr;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -67,7 +61,7 @@ internal class BaseHandler
         );
     }
 
-    public virtual async Task<HttpResponseData> OkAsync(HttpRequestData request, object value, CancellationToken cancellationToken = default)
+    public virtual async Task<HttpResponseData> OkAsync(HttpRequestData request, object? value, CancellationToken cancellationToken = default)
     {
         var response = request.CreateResponse(HttpStatusCode.OK);
         await response.WriteAsJsonAsync(value, cancellationToken);
@@ -86,11 +80,11 @@ internal class BaseHandler
 
     public virtual async Task<HttpResponseData> ProblemAsync(
         HttpRequestData request,
-        string detail = null,
-        string instance = null,
+        string? detail = null,
+        string? instance = null,
         HttpStatusCode? statusCode = null,
-        string title = null,
-        string type = null,
+        string? title = null,
+        string? type = null,
         CancellationToken cancellationToken = default)
     {
         var host = Environment.GetEnvironmentVariable("WEBSITE_HOSTNAME");
@@ -112,11 +106,11 @@ internal class BaseHandler
     public virtual async Task<HttpResponseData> ValidationProblemAsync(
         HttpRequestData request,
         ModelStateDictionary modelStateDictionary,
-        string detail = null,
-        string instance = null,
+        string? detail = null,
+        string? instance = null,
         HttpStatusCode? statusCode = null,
-        string title = null,
-        string type = null,
+        string? title = null,
+        string? type = null,
         CancellationToken cancellationToken = default)
     {
         var validationProblem = new ValidationProblemDetails(modelStateDictionary)
@@ -144,7 +138,7 @@ internal class BaseHandler
         return response;
     }
 
-    internal static T TryDeserializeRequestBody<T>(Stream requestBody)
+    internal static T? TryDeserializeRequestBody<T>(Stream requestBody)
     {
         try
         {

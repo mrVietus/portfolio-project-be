@@ -1,8 +1,5 @@
-using System;
 using System.Net;
 using System.Net.Mime;
-using System.Threading;
-using System.Threading.Tasks;
 using Crawler.Application.Common;
 using Crawler.Application.Common.Interfaces;
 using Crawler.Application.Crawler.Commands.RemoveCrawl;
@@ -207,7 +204,7 @@ internal class CrawlerHandler(ICacheService cacheService, ISender sender, IMappe
             await OkAsync(request, commandResult.Value, cancellationToken);
     }
 
-    public async Task<HttpResponseData> CacheResponseAndRespondOkAsync<T>(string key, T value, HttpRequestData request, CancellationToken cancellationToken)
+    public async Task<HttpResponseData> CacheResponseAndRespondOkAsync<T>(string key, T? value, HttpRequestData request, CancellationToken cancellationToken)
     {
         cacheService.SetCache(key, value);
         return await OkAsync(request, value, cancellationToken);
