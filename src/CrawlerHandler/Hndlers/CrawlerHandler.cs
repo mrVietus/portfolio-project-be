@@ -204,7 +204,7 @@ internal class CrawlerHandler(ICacheService cacheService, ISender sender, IMappe
             await OkAsync(request, commandResult.Value, cancellationToken);
     }
 
-    public async Task<HttpResponseData> CacheResponseAndRespondOkAsync<T>(string key, T value, HttpRequestData request, CancellationToken cancellationToken)
+    public async Task<HttpResponseData> CacheResponseAndRespondOkAsync<T>(string key, T? value, HttpRequestData request, CancellationToken cancellationToken)
     {
         cacheService.SetCache(key, value);
         return await OkAsync(request, value, cancellationToken);
