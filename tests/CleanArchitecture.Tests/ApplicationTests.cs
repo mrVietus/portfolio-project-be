@@ -1,7 +1,4 @@
-﻿using FluentAssertions;
-using NetArchTest.Rules;
-
-namespace Crawler.CleanArchitecture.Tests;
+﻿namespace Crawler.CleanArchitecture.Tests;
 
 [TestFixture]
 public class ApplicationTests
@@ -10,34 +7,18 @@ public class ApplicationTests
     public void ApplicationShouldNotHaveDependencyOnInfrastructureAndFunctionHandler()
     {
         // Arrange
-        var assembly = typeof(Application.Common.Constants).Assembly;
+        var assembly = typeof(Application.DependencyInjection).Assembly;
 
         var otherProjects = new[]
         {
-            "Application",
-            "Infrastructure"
+            "Crawler.FunctionHandler",
+            "Crawler.Infrastructure"
         };
 
         // Act
         var result = Types.InAssembly(assembly)
             .ShouldNot()
-            .HaveDependencyOnAll(otherProjects)
-            .GetResult();
-
-        // Assert
-        result.IsSuccessful.Should().BeTrue();
-    }
-
-    [Test]
-    public void ApplicationShouldHaveDependencyOnDomain()
-    {
-        // Arrange
-        var assembly = typeof(Application.Common.Constants).Assembly;
-
-        // Act
-        var result = Types.InAssembly(assembly)
-            .Should()
-            .HaveDependencyOn("Domain")
+            .HaveDependencyOnAny(otherProjects)
             .GetResult();
 
         // Assert

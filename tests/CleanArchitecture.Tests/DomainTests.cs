@@ -1,8 +1,4 @@
-﻿using FluentAssertions;
-using NetArchTest.Rules;
-
-namespace Crawler.CleanArchitecture.Tests;
-
+﻿namespace Crawler.CleanArchitecture.Tests;
 
 [TestFixture]
 public class DomainTests
@@ -15,15 +11,15 @@ public class DomainTests
 
         var otherProjects = new[]
         {
-            "Application",
-            "Infrastructure",
-            "FunctionHandler"
+            "Crawler.Application",
+            "Crawler.Infrastructure",
+            "Crawler.FunctionHandler"
         };
 
         // Act
         var result = Types.InAssembly(assembly)
             .ShouldNot()
-            .HaveDependencyOnAll(otherProjects)
+            .HaveDependencyOnAny(otherProjects)
             .GetResult();
 
         // Assert
